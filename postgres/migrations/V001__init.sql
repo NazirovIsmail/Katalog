@@ -1,0 +1,5 @@
+CREATE TABLE katalog (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  parent_id INTEGER NOT NULL
+);
