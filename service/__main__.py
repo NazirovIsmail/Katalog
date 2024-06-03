@@ -1,7 +1,7 @@
-
 import asyncio
 import asyncpg
 import time
+from db_work import get_all_documents, get_document, insert_new_katalog,insert_new_document
 
 async def main():
     while True:
@@ -12,12 +12,14 @@ async def main():
             time.sleep(2)
             continue
         break
-    values = await conn.fetch(
-        'SELECT * FROM katalog WHERE id = $1',
-        1,
-    )
-    print(values)
+    await get_all_documents(conn)
+    await get_document(conn,'movie reviews','Blade Runner')
+    await insert_new_katalog(conn,'movie reviews/80s', 'year 83')
+    await insert_new_document(conn, 'movie reviews/80s', ('Beverly Hills Cop','txt',1,2))
     await conn.close()
+
+
+
 
 
 if __name__ == '__main__':
