@@ -12,15 +12,15 @@ services:
       POSTGRES_USER: admin
       POSTGRES_DB: katalog
       POSTGRES_PASSWORD: admin
-      #PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-     # - ./volumes/postgres:/var/lib/postgresql/data/pgdata
       - ./postgres/migrations:/docker-entrypoint-initdb.d
   
   service:
     networks:
       service_network:
     build: .
+    ports:
+      - "5000:5000"
   
 networks:
   service_network:
