@@ -1,27 +1,18 @@
 import asyncio
 import asyncpg
-import time
 from db_work import get_all_documents, get_document, insert_new_katalog,insert_new_document, get_katalog_info
 from quart import Quart, request
+from quart_auth import basic_auth_required, QuartAuth
+import secrets
 import yaml
 
-#async def main():
-    # while True:
-    #     try:
-    #         conn = await asyncpg.connect(user='admin', password='admin',
-    #                                     database='katalog', host='postgres', port=5432)
-    #     except:
-    #         time.sleep(2)
-    #         continue
-    #     break
-    # #print(await get_all_documents(conn))
-    # #print('get_document',await get_document(conn,'movie_reviews/80s','Blade_Runner'))
-    # await insert_new_katalog(conn,'movie_reviews/80s', 'year_83')
-    # await insert_new_document(conn, 'movie_reviews/80s', ('Beverly_Hills_Cop','txt',1,2))
-    # await conn.close()
-
-
 app = Quart(__name__)
+app.config["QUART_AUTH_BASIC_USERNAME"] = "admin"
+app.config["QUART_AUTH_BASIC_PASSWORD"] = "admin"
+app.secret_key = secrets.token_urlsafe(16)  
+
+QuartAuth(app)
+
 
 async def connection():
     conn=await asyncpg.connect(user='admin', password='admin',
@@ -45,10 +36,12 @@ async def document(path):
         result=await get_document(conn, path, document_name)
     else:
         result=await get_katalog_info(conn, path)
+        result=yaml.dump(result)
     return result
 
 @app.route('/', methods=['POST'])
-async def index():
+@basic_auth_required()
+async def insert_new_data():
     conn=await connection()
     data=await request.get_data()
     str_data=data.decode("utf-8")
@@ -73,8 +66,3 @@ async def index():
 
 
 app.run(host='0.0.0.0')
-
-
-
-# if __name__ == '__main__':
-#     asyncio.run(main())
